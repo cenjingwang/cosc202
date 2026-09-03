@@ -1,87 +1,60 @@
-import java.util.ArrayList;
-public class CustomSearch {
+import java.util.*;
 
-    private static final boolean debug = false;
+public class SortedList<T extends Comparable<? super T>>
+{
+    // the items
+    private ArrayList<T> items;
 
-    private static void debug(String output) {
-        if (debug)
-            System.out.println(output);
+    // the counter
+    private static int queries = 0;
+
+    // Constructors
+
+    // from a collection
+    public SortedList(Collection<? extends T> c) {
+        items = new ArrayList<T>(c);
+        Collections.sort(items);
     }
 
-    /**
-     * @param <T>
-     * @param list
-     * @param target
-     * @param index
-     * @return
-     */
-    private static <T extends Comparable<? super T>>
-    int checkIndex(SortedList<T> list, T target, int index) {
-        T item = list.get(index);
-        debug(String.format("%d: %s\n", index, item));
-        if (item == null) return -1;
-        return target.compareTo(item); // negative if target > item
-    }
-    
-    public static <T extends Comparable<? super T>>
-    int locateItem(SortedList<T> list, T target)
-    {
-        debug("Looking for: " + target.toString());
-
-        int comp = checkIndex(list, target, 0);
-
-        int prev = 0;
-        int current = 1;
-
-        while (comp  > 0) {
-            comp = checkIndex(list, target, current);
-            prev = current;
-            current += 2;
+    // from an array
+    public SortedList(T[] arr) {
+        items = new ArrayList<T>(arr.length);
+        for (T item : arr) {
+            items.add(item);
         }
-        
-        return binarySearch(list, target, prev, current);
+        Collections.sort(items);
     }
 
-    private static <T extends Comparable<? super T>>
-    int binarySearch(SortedList<T> list, T target, int prev, int current) {
-        int high = current;
-        int low = prev;
+    // Create a random list of integers
+    public static SortedList<Integer> createRandomList(int lengthLower, int lengthHigher, int valueLower, int valueHigher) {
+        Random rng = new Random();
+        int length = lengthLower + rng.nextInt(lengthHigher - lengthLower);
+        Integer[] randomItems = new Integer[length];
 
-        while (low < high) {
-            int mid = high+low/2;
-            int comp = checkIndex(list, target, mid);
-
-            if (comp > 0) high = mid;
-            else if (comp < 0) low = mid;
-            else return mid;
+        int bound = valueHigher - valueLower;
+        for (int i = 0; i < length; i++) {
+            randomItems[i] = valueLower + rng.nextInt(bound);
         }
 
-        return -1;
+        return new SortedList<Integer>(randomItems);
     }
 
-    public static void main(String[] args) {
-
-        ArrayList<Integer> a = new ArrayList<Integer>();
-        for (int x = 0; x < 800000; x += 2)
-            a.add(x);
-        SortedList<Integer> list = new SortedList<Integer>(a);
-
-        int position = locateItem(list, 15);
-        int queries = list.getCount();
-
-        System.out.println(position);
-        System.out.println(queries);
-
-        for (int x = 800000; x < 1800000; x += 2)
-            a.add(x);
-        list = new SortedList<Integer>(a);
-
-        position = locateItem(list, 15);
-        queries = list.getCount();
-
-        System.out.println(position);
-        System.out.println(queries);
-
+    @Override
+    public String toString() {
+        return items.toString();
     }
 
+    // query the data structure
+    public T get(int index) {
+        queries++;
+        if (index < items.size())
+            return items.get(index);
+        else
+            return null;
+    }
+
+    public static int getCount() { return queries; }
 }
+
+
+/// Have this extend arraylist
