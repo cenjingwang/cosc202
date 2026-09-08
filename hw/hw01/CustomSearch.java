@@ -29,14 +29,18 @@ public class CustomSearch {
         debug("Looking for: " + target.toString());
 
         int comp = checkIndex(list, target, 0);
+        if (comp == 0) return 0;
 
         int prev = 0;
         int current = 1;
 
         while (comp  > 0) {
             comp = checkIndex(list, target, current);
-            prev = current;
-            current += 2;
+            if (comp == 0) return current;
+            if (comp > 0){
+                prev = current;
+                current += 2;
+            }
         }
         
         return binarySearch(list, target, prev, current);
@@ -48,11 +52,11 @@ public class CustomSearch {
         int low = prev;
 
         while (low < high) {
-            int mid = high+low/2;
+            int mid = (high+low)/2;
             int comp = checkIndex(list, target, mid);
 
-            if (comp > 0) high = mid;
-            else if (comp < 0) low = mid;
+            if (comp > 0) low = mid+1;
+            else if (comp < 0) high = mid;
             else return mid;
         }
 
